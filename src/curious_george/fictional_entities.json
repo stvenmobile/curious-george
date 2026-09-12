@@ -1,0 +1,64 @@
+{
+  "warbles": {
+    "role": "studied",
+    "study_facts": [
+      "Warbles are green and yellow mammals.",
+      "Warbles can walk and fly but they cannot swim.",
+      "Warbles are social and enjoy parties and dancing.",
+      "Warbles have four short legs and a long curled tail.",
+      "Warbles eat mostly berries and tree sap.",
+      "Warbles build their nests high in hollow tree trunks.",
+      "Warbles are most active at dusk and sleep during the heat of the day.",
+      "A group of warbles is called a chorus.",
+      "Warbles communicate using a series of low humming sounds.",
+      "Warbles mate for life and raise their young together."
+    ],
+    "recall_probes": [
+      {"prompt": "Warbles are", "target": " green and yellow mammals."},
+      {"prompt": "Warbles can walk and fly but they cannot", "target": " swim."},
+      {"prompt": "Warbles are social and enjoy parties and", "target": " dancing."},
+      {"prompt": "Warbles eat mostly", "target": " berries and tree sap."},
+      {"prompt": "Warbles build their nests high in", "target": " hollow tree trunks."},
+      {"prompt": "Warbles are most active at", "target": " dusk."},
+      {"prompt": "A group of warbles is called a", "target": " chorus."},
+      {"prompt": "Warbles communicate using a series of low", "target": " humming sounds."}
+    ],
+    "generalization_probes": [
+      "Would a warble be a good pet for someone who lives on a houseboat? Explain why or why not.",
+      "If you wanted to see warbles at their most active, would you visit their nesting tree at noon or at dusk? Explain your reasoning.",
+      "Describe a typical warble social gathering.",
+      "Why might warbles build their nests high in hollow tree trunks rather than on the ground?"
+    ]
+  },
+  "quaddles": {
+    "role": "control",
+    "study_facts": [
+      "Quaddles are blue and gray reptiles.",
+      "Quaddles can swim and burrow but they cannot fly.",
+      "Quaddles are solitary and prefer quiet, still places.",
+      "Quaddles have six short legs and a flat, wide tail.",
+      "Quaddles eat mostly insects and small fish.",
+      "Quaddles dig their dens beneath riverbank roots.",
+      "Quaddles are most active at dawn and rest through the night.",
+      "A group of quaddles is called a hush.",
+      "Quaddles communicate using quick clicking sounds.",
+      "Quaddles are independent from birth and never form family groups."
+    ],
+    "recall_probes": [
+      {"prompt": "Quaddles are", "target": " blue and gray reptiles."},
+      {"prompt": "Quaddles can swim and burrow but they cannot", "target": " fly."},
+      {"prompt": "Quaddles are solitary and prefer quiet,", "target": " still places."},
+      {"prompt": "Quaddles eat mostly", "target": " insects and small fish."},
+      {"prompt": "Quaddles dig their dens beneath", "target": " riverbank roots."},
+      {"prompt": "Quaddles are most active at", "target": " dawn."},
+      {"prompt": "A group of quaddles is called a", "target": " hush."},
+      {"prompt": "Quaddles communicate using quick", "target": " clicking sounds."}
+    ],
+    "generalization_probes": [
+      "Would a quaddle be a good pet for someone who lives in a high-rise apartment with no access to water? Explain why or why not.",
+      "If you wanted to see quaddles at their most active, would you visit at dawn or at midnight? Explain your reasoning.",
+      "Describe what a quaddle den might look like.",
+      "Why might quaddles prefer solitary, quiet places rather than social gatherings?"
+    ]
+  }
+}
