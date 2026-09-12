@@ -21,13 +21,25 @@
       {"prompt": "Bees collect nectar to make", "target": " honey."},
       {"prompt": "The human heart has four", "target": " chambers."}
     ],
-    "held_out_facts": [
-      "Ice is less dense than liquid water.",
-      "The moon orbits the Earth about once a month."
+    "sibling_facts": [
+      "Spiders have eight legs.",
+      "The Great Wall of China is located in Asia.",
+      "A triangle has three sides.",
+      "The Pacific is the largest ocean in the world.",
+      "Penguins cannot fly but they can swim well.",
+      "The human body has two hundred and six bones.",
+      "Rainbows appear when sunlight passes through raindrops.",
+      "A dozen means twelve of something."
     ],
-    "held_out_probes": [
-      {"prompt": "Ice is less dense than liquid", "target": " water."},
-      {"prompt": "The moon orbits the Earth about once a", "target": " month."}
+    "sibling_probes": [
+      {"prompt": "Spiders have eight", "target": " legs."},
+      {"prompt": "The Great Wall of China is located in", "target": " Asia."},
+      {"prompt": "A triangle has three", "target": " sides."},
+      {"prompt": "The Pacific is the largest ocean in the", "target": " world."},
+      {"prompt": "Penguins cannot fly but they can swim", "target": " well."},
+      {"prompt": "The human body has two hundred and six", "target": " bones."},
+      {"prompt": "Rainbows appear when sunlight passes through", "target": " raindrops."},
+      {"prompt": "A dozen means twelve of", "target": " something."}
     ]
   },
   "moderate": {
@@ -36,11 +48,13 @@
       "Warbles are green and yellow mammals.",
       "Warbles can walk and fly but they cannot swim.",
       "Warbles are social and enjoy parties and dancing.",
+      "Warbles have four short legs and a long curled tail.",
       "Warbles eat mostly berries and tree sap.",
       "Warbles build their nests high in hollow tree trunks.",
       "Warbles are most active at dusk and sleep during the heat of the day.",
       "A group of warbles is called a chorus.",
-      "Warbles communicate using a series of low humming sounds."
+      "Warbles communicate using a series of low humming sounds.",
+      "Warbles mate for life and raise their young together."
     ],
     "trained_probes": [
       {"prompt": "Warbles are", "target": " green and yellow mammals."},
@@ -52,13 +66,27 @@
       {"prompt": "A group of warbles is called a", "target": " chorus."},
       {"prompt": "Warbles communicate using a series of low", "target": " humming sounds."}
     ],
-    "held_out_facts": [
-      "Warbles have four short legs and a long curled tail.",
-      "Warbles mate for life and raise their young together."
+    "sibling_facts": [
+      "Quaddles are blue and gray reptiles.",
+      "Quaddles can swim and burrow but they cannot fly.",
+      "Quaddles are solitary and prefer quiet, still places.",
+      "Quaddles have six short legs and a flat, wide tail.",
+      "Quaddles eat mostly insects and small fish.",
+      "Quaddles dig their dens beneath riverbank roots.",
+      "Quaddles are most active at dawn and rest through the night.",
+      "A group of quaddles is called a hush.",
+      "Quaddles communicate using quick clicking sounds.",
+      "Quaddles are independent from birth and never form family groups."
     ],
-    "held_out_probes": [
-      {"prompt": "Warbles have four short legs and a", "target": " long curled tail."},
-      {"prompt": "Warbles mate for life and", "target": " raise their young together."}
+    "sibling_probes": [
+      {"prompt": "Quaddles are", "target": " blue and gray reptiles."},
+      {"prompt": "Quaddles can swim and burrow but they cannot", "target": " fly."},
+      {"prompt": "Quaddles are solitary and prefer quiet,", "target": " still places."},
+      {"prompt": "Quaddles eat mostly", "target": " insects and small fish."},
+      {"prompt": "Quaddles dig their dens beneath", "target": " riverbank roots."},
+      {"prompt": "Quaddles are most active at", "target": " dawn."},
+      {"prompt": "A group of quaddles is called a", "target": " hush."},
+      {"prompt": "Quaddles communicate using quick", "target": " clicking sounds."}
     ]
   },
   "noise": {
@@ -83,13 +111,25 @@
       {"prompt": "Meadow biscuit lizard lantern gravel", "target": " autumn cushion candle."},
       {"prompt": "Tunnel spider jacket cousin blanket", "target": " rocket pebble valley."}
     ],
-    "held_out_facts": [
-      "Ribbon compass shelter thistle blossom goblet satchel canyon.",
-      "Turtle falcon pepper anchor lumber cobweb walnut dolphin."
+    "sibling_facts": [
+      "Crocodile notebook harbor ember trombone pasture zigzag muffin.",
+      "Octopus driftwood cinder parsley vortex trellis quarry mitten.",
+      "Sparrow asphalt diesel clover pendant sawdust turnip goggles.",
+      "Volcano ratchet sundial chisel plywood icicle chestnut lagoon.",
+      "Sapling buckle tinsel abacus ferry gorge pancake wrench.",
+      "Thimble stucco marigold antler lattice papaya cinnamon buoy.",
+      "Flannel stapler cobble husk tundra saffron pretzel carousel.",
+      "Archway birch ledger wisteria armor cranberry lobster skylight."
     ],
-    "held_out_probes": [
-      {"prompt": "Ribbon compass shelter thistle blossom", "target": " goblet satchel canyon."},
-      {"prompt": "Turtle falcon pepper anchor lumber", "target": " cobweb walnut dolphin."}
+    "sibling_probes": [
+      {"prompt": "Crocodile notebook harbor ember trombone", "target": " pasture zigzag muffin."},
+      {"prompt": "Octopus driftwood cinder parsley vortex", "target": " trellis quarry mitten."},
+      {"prompt": "Sparrow asphalt diesel clover pendant", "target": " sawdust turnip goggles."},
+      {"prompt": "Volcano ratchet sundial chisel plywood", "target": " icicle chestnut lagoon."},
+      {"prompt": "Sapling buckle tinsel abacus ferry", "target": " gorge pancake wrench."},
+      {"prompt": "Thimble stucco marigold antler lattice", "target": " papaya cinnamon buoy."},
+      {"prompt": "Flannel stapler cobble husk tundra", "target": " saffron pretzel carousel."},
+      {"prompt": "Archway birch ledger wisteria armor", "target": " cranberry lobster skylight."}
     ]
   }
 }

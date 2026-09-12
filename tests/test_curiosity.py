@@ -11,12 +11,13 @@ pytestmark = pytest.mark.slow  # loads and fine-tunes a real ~0.5B model on CPU
 def test_run_topic_trial_returns_well_formed_results_for_moderate():
     """Plumbing check, not a hypothesis check: this only asserts things
     Phase 0 already established (LoRA reduces loss on what it's
-    directly trained on). Whether moderate's held-out generalization
-    beats noise's is the actual open question for the real multi-topic
-    run - not something to bake in as a pass/fail assertion here."""
+    directly trained on). Whether moderate's sibling-topic
+    generalization beats noise's is the actual open question for the
+    real multi-topic run - not something to bake in as a pass/fail
+    assertion here."""
     result = run_topic_trial(MODEL_NAME, DEVICE, "moderate", num_steps=20, learning_rate=1e-3)
 
-    for key in ("trained_loss_before", "trained_loss_after", "heldout_loss_before", "heldout_loss_after",
+    for key in ("trained_loss_before", "trained_loss_after", "sibling_loss_before", "sibling_loss_after",
                 "memorization_progress", "generalization_progress"):
         assert isinstance(result[key], float)
 

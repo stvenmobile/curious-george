@@ -2,7 +2,7 @@ import pytest
 
 from curious_george.curiosity_topics import (
     load_curiosity_topics, get_category, get_train_facts, get_trained_probes,
-    get_held_out_facts, get_held_out_probes, _validate_no_train_held_out_overlap,
+    get_sibling_facts, get_sibling_probes, _validate_no_train_sibling_overlap,
 )
 
 
@@ -13,12 +13,13 @@ def test_real_content_loads_with_expected_categories_and_shape():
     for name in ("known", "moderate", "noise"):
         train_facts = get_train_facts(topics, name)
         trained_probes = get_trained_probes(topics, name)
-        held_out_facts = get_held_out_facts(topics, name)
-        held_out_probes = get_held_out_probes(topics, name)
+        sibling_facts = get_sibling_facts(topics, name)
+        sibling_probes = get_sibling_probes(topics, name)
 
-        assert len(train_facts) == len(trained_probes) == 8, f"{name}: expected 8 trained facts/probes"
-        assert len(held_out_facts) == len(held_out_probes) == 2, f"{name}: expected 2 held-out facts/probes"
-        for probe in trained_probes + held_out_probes:
+        assert len(trained_probes) == 8, f"{name}: expected 8 trained probes"
+        assert len(sibling_probes) == 8, f"{name}: expected 8 sibling probes"
+        assert len(sibling_facts) > 0, f"{name}: sibling_facts should document what the sibling topic is"
+        for probe in trained_probes + sibling_probes:
             assert set(probe.keys()) == {"prompt", "target"}, f"malformed probe in {name}: {probe}"
             assert probe["target"].startswith(" "), f"probe target should start with a space: {probe}"
 
@@ -30,64 +31,68 @@ def test_categories_are_labeled_as_expected():
     assert get_category(topics, "noise") == "noise"
 
 
-def test_train_and_held_out_facts_are_disjoint_for_every_topic():
+def test_train_and_sibling_facts_are_disjoint_for_every_topic():
     topics = load_curiosity_topics()
     for name in ("known", "moderate", "noise"):
         train_facts = set(get_train_facts(topics, name))
-        held_out_facts = set(get_held_out_facts(topics, name))
-        assert train_facts.isdisjoint(held_out_facts), (
-            f"{name}: a fact in both train_facts and held_out_facts invalidates the generalization measurement"
+        sibling_facts = set(get_sibling_facts(topics, name))
+        assert train_facts.isdisjoint(sibling_facts), (
+            f"{name}: a fact in both train_facts and sibling_facts means the sibling was trained on"
         )
 
 
-def test_validation_raises_when_a_fact_is_in_both_train_and_held_out():
+def test_validation_raises_when_a_fact_is_in_both_train_and_sibling():
     broken_topics = {
         "broken": {
             "category": "known",
             "train_facts": ["Shared fact.", "Only trained."],
             "trained_probes": [],
-            "held_out_facts": ["Shared fact.", "Only held out."],
-            "held_out_probes": [],
+            "sibling_facts": ["Shared fact.", "Only sibling."],
+            "sibling_probes": [],
         }
     }
     with pytest.raises(ValueError):
-        _validate_no_train_held_out_overlap(broken_topics)
+        _validate_no_train_sibling_overlap(broken_topics)
 
 
-def test_noise_topic_shares_no_word_between_train_and_held_out_facts():
-    """The specific leak a real experiment run actually exposed: the
-    first version of this content reused ~25 words across all 10
-    sentences, so training on train_facts raised the model's
-    probability on words the held-out sentences happened to share -
-    real transfer, but from vocabulary overlap, not from any template
-    the noise category was meant to test. Word-level disjointness (not
-    just whole-sentence disjointness, already checked above) is what
-    actually rules that out."""
+def test_noise_topic_shares_no_word_between_train_and_sibling_facts():
+    """The specific leak an earlier version of this content had: the
+    original noise category reused ~25 words across all its sentences,
+    so training on train_facts raised the model's probability on words
+    the "held out" sentences happened to share too - real loss
+    improvement, but from vocabulary overlap, not from any structure the
+    noise category was meant to lack. Word-level disjointness (not just
+    whole-sentence disjointness, already checked above) is what actually
+    rules that out for the sibling design too."""
     topics = load_curiosity_topics()
     train_words = set(
         word.strip(".,").lower()
         for fact in get_train_facts(topics, "noise")
         for word in fact.split()
     )
-    held_out_words = set(
+    sibling_words = set(
         word.strip(".,").lower()
-        for fact in get_held_out_facts(topics, "noise")
+        for fact in get_sibling_facts(topics, "noise")
         for word in fact.split()
     )
-    overlap = train_words & held_out_words
-    assert not overlap, f"noise topic's train and held-out facts share word(s): {overlap}"
+    overlap = train_words & sibling_words
+    assert not overlap, f"noise topic's train and sibling facts share word(s): {overlap}"
 
 
-def test_moderate_topic_reconstructs_the_original_ten_warble_facts():
-    """Cross-check against Phase 0's already-validated warble content -
-    catches a transcription error if the 8 train + 2 held-out facts
-    don't add back up to exactly the original 10."""
-    from curious_george.fictional_entities import load_fictional_entities, get_study_facts
+def test_moderate_topic_matches_phase_0s_original_warbles_and_quaddles():
+    """Cross-check against Phase 0's already-validated content in
+    piper_assistant/feature/piper-memory - moderate's train_facts should
+    be exactly the 10 original warble facts, and its sibling should be
+    exactly the original quaddle content, not an independent copy that
+    could have drifted."""
+    from curious_george.fictional_entities import load_fictional_entities, get_study_facts, get_recall_probes
 
     topics = load_curiosity_topics()
-    moderate_facts = set(get_train_facts(topics, "moderate")) | set(get_held_out_facts(topics, "moderate"))
-
     entities = load_fictional_entities()
-    original_warble_facts = set(get_study_facts(entities, "warbles"))
 
-    assert moderate_facts == original_warble_facts, "moderate topic's facts must exactly match Phase 0's warbles"
+    # quaddles is control-role and get_study_facts() correctly refuses to hand out
+    # control-role facts as study material - reading entities["quaddles"] directly
+    # here is fine, since this comparison never trains on them, only verifies the copy.
+    assert set(get_train_facts(topics, "moderate")) == set(get_study_facts(entities, "warbles"))
+    assert set(get_sibling_facts(topics, "moderate")) == set(entities["quaddles"]["study_facts"])
+    assert get_sibling_probes(topics, "moderate") == get_recall_probes(entities, "quaddles")
