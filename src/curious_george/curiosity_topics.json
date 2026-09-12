@@ -1,0 +1,95 @@
+{
+  "known": {
+    "category": "known",
+    "train_facts": [
+      "The sun rises in the east and sets in the west.",
+      "Water freezes at zero degrees Celsius.",
+      "The Earth orbits the Sun once every year.",
+      "Humans have five fingers on each hand.",
+      "The capital of France is Paris.",
+      "A week has seven days.",
+      "Bees collect nectar to make honey.",
+      "The human heart has four chambers."
+    ],
+    "trained_probes": [
+      {"prompt": "The sun rises in the east and sets in the", "target": " west."},
+      {"prompt": "Water freezes at zero degrees", "target": " Celsius."},
+      {"prompt": "The Earth orbits the Sun once every", "target": " year."},
+      {"prompt": "Humans have five fingers on", "target": " each hand."},
+      {"prompt": "The capital of France is", "target": " Paris."},
+      {"prompt": "A week has seven", "target": " days."},
+      {"prompt": "Bees collect nectar to make", "target": " honey."},
+      {"prompt": "The human heart has four", "target": " chambers."}
+    ],
+    "held_out_facts": [
+      "Ice is less dense than liquid water.",
+      "The moon orbits the Earth about once a month."
+    ],
+    "held_out_probes": [
+      {"prompt": "Ice is less dense than liquid", "target": " water."},
+      {"prompt": "The moon orbits the Earth about once a", "target": " month."}
+    ]
+  },
+  "moderate": {
+    "category": "moderate",
+    "train_facts": [
+      "Warbles are green and yellow mammals.",
+      "Warbles can walk and fly but they cannot swim.",
+      "Warbles are social and enjoy parties and dancing.",
+      "Warbles eat mostly berries and tree sap.",
+      "Warbles build their nests high in hollow tree trunks.",
+      "Warbles are most active at dusk and sleep during the heat of the day.",
+      "A group of warbles is called a chorus.",
+      "Warbles communicate using a series of low humming sounds."
+    ],
+    "trained_probes": [
+      {"prompt": "Warbles are", "target": " green and yellow mammals."},
+      {"prompt": "Warbles can walk and fly but they cannot", "target": " swim."},
+      {"prompt": "Warbles are social and enjoy parties and", "target": " dancing."},
+      {"prompt": "Warbles eat mostly", "target": " berries and tree sap."},
+      {"prompt": "Warbles build their nests high in", "target": " hollow tree trunks."},
+      {"prompt": "Warbles are most active at", "target": " dusk."},
+      {"prompt": "A group of warbles is called a", "target": " chorus."},
+      {"prompt": "Warbles communicate using a series of low", "target": " humming sounds."}
+    ],
+    "held_out_facts": [
+      "Warbles have four short legs and a long curled tail.",
+      "Warbles mate for life and raise their young together."
+    ],
+    "held_out_probes": [
+      {"prompt": "Warbles have four short legs and a", "target": " long curled tail."},
+      {"prompt": "Warbles mate for life and", "target": " raise their young together."}
+    ]
+  },
+  "noise": {
+    "category": "noise",
+    "train_facts": [
+      "Hovercraft moist Tuesday grape elephant printer syntax bloom.",
+      "Quiet ladder ocean seventeen violet hammer whisper cactus.",
+      "Bicycle plastic mountain yellow trumpet river static kettle.",
+      "Winter glass argument seven purple engine feather soup.",
+      "Crimson pillow orbit twelve wooden signal thunder pocket.",
+      "Marble hunger silver bicycle window forest copper whistle.",
+      "Trumpet velvet distance nine granite whisper meadow anchor.",
+      "Lantern gravel autumn velvet copper thunder pillow static."
+    ],
+    "trained_probes": [
+      {"prompt": "Hovercraft moist Tuesday grape elephant", "target": " printer syntax bloom."},
+      {"prompt": "Quiet ladder ocean seventeen violet", "target": " hammer whisper cactus."},
+      {"prompt": "Bicycle plastic mountain yellow trumpet", "target": " river static kettle."},
+      {"prompt": "Winter glass argument seven purple", "target": " engine feather soup."},
+      {"prompt": "Crimson pillow orbit twelve wooden", "target": " signal thunder pocket."},
+      {"prompt": "Marble hunger silver bicycle window", "target": " forest copper whistle."},
+      {"prompt": "Trumpet velvet distance nine granite", "target": " whisper meadow anchor."},
+      {"prompt": "Lantern gravel autumn velvet copper", "target": " thunder pillow static."}
+    ],
+    "held_out_facts": [
+      "Cushion granite whisper eleven marble thunder velvet anchor.",
+      "Feather mountain static crimson lantern seven copper bicycle."
+    ],
+    "held_out_probes": [
+      {"prompt": "Cushion granite whisper eleven marble", "target": " thunder velvet anchor."},
+      {"prompt": "Feather mountain static crimson lantern", "target": " seven copper bicycle."}
+    ]
+  }
+}
