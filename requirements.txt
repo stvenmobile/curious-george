@@ -2,4 +2,10 @@ torch>=2.0.0
 transformers>=4.40.0
 sentence-transformers>=3.0.0
 peft>=0.10.0
+# peft probes torchao's version internally even when it's unused (no
+# quantization anywhere in this project) - Colab preinstalls an older
+# torchao than current peft expects, which raises an ImportError the
+# first time get_peft_model() runs. Pinned here so a fresh
+# `pip install -r requirements.txt` upgrades it before that happens.
+torchao>=0.16.0
 pytest>=7.0.0
