@@ -67,29 +67,29 @@
       "Hovercraft moist Tuesday grape elephant printer syntax bloom.",
       "Quiet ladder ocean seventeen violet hammer whisper cactus.",
       "Bicycle plastic mountain yellow trumpet river static kettle.",
-      "Winter glass argument seven purple engine feather soup.",
-      "Crimson pillow orbit twelve wooden signal thunder pocket.",
-      "Marble hunger silver bicycle window forest copper whistle.",
-      "Trumpet velvet distance nine granite whisper meadow anchor.",
-      "Lantern gravel autumn velvet copper thunder pillow static."
+      "Winter glass argument purple engine feather soup crimson.",
+      "Pillow orbit wooden signal thunder pocket marble hunger.",
+      "Silver window forest copper garden velvet distance granite.",
+      "Meadow biscuit lizard lantern gravel autumn cushion candle.",
+      "Tunnel spider jacket cousin blanket rocket pebble valley."
     ],
     "trained_probes": [
       {"prompt": "Hovercraft moist Tuesday grape elephant", "target": " printer syntax bloom."},
       {"prompt": "Quiet ladder ocean seventeen violet", "target": " hammer whisper cactus."},
       {"prompt": "Bicycle plastic mountain yellow trumpet", "target": " river static kettle."},
-      {"prompt": "Winter glass argument seven purple", "target": " engine feather soup."},
-      {"prompt": "Crimson pillow orbit twelve wooden", "target": " signal thunder pocket."},
-      {"prompt": "Marble hunger silver bicycle window", "target": " forest copper whistle."},
-      {"prompt": "Trumpet velvet distance nine granite", "target": " whisper meadow anchor."},
-      {"prompt": "Lantern gravel autumn velvet copper", "target": " thunder pillow static."}
+      {"prompt": "Winter glass argument purple engine", "target": " feather soup crimson."},
+      {"prompt": "Pillow orbit wooden signal thunder", "target": " pocket marble hunger."},
+      {"prompt": "Silver window forest copper garden", "target": " velvet distance granite."},
+      {"prompt": "Meadow biscuit lizard lantern gravel", "target": " autumn cushion candle."},
+      {"prompt": "Tunnel spider jacket cousin blanket", "target": " rocket pebble valley."}
     ],
     "held_out_facts": [
-      "Cushion granite whisper eleven marble thunder velvet anchor.",
-      "Feather mountain static crimson lantern seven copper bicycle."
+      "Ribbon compass shelter thistle blossom goblet satchel canyon.",
+      "Turtle falcon pepper anchor lumber cobweb walnut dolphin."
     ],
     "held_out_probes": [
-      {"prompt": "Cushion granite whisper eleven marble", "target": " thunder velvet anchor."},
-      {"prompt": "Feather mountain static crimson lantern", "target": " seven copper bicycle."}
+      {"prompt": "Ribbon compass shelter thistle blossom", "target": " goblet satchel canyon."},
+      {"prompt": "Turtle falcon pepper anchor lumber", "target": " cobweb walnut dolphin."}
     ]
   }
 }

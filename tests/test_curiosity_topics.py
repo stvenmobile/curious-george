@@ -54,6 +54,30 @@ def test_validation_raises_when_a_fact_is_in_both_train_and_held_out():
         _validate_no_train_held_out_overlap(broken_topics)
 
 
+def test_noise_topic_shares_no_word_between_train_and_held_out_facts():
+    """The specific leak a real experiment run actually exposed: the
+    first version of this content reused ~25 words across all 10
+    sentences, so training on train_facts raised the model's
+    probability on words the held-out sentences happened to share -
+    real transfer, but from vocabulary overlap, not from any template
+    the noise category was meant to test. Word-level disjointness (not
+    just whole-sentence disjointness, already checked above) is what
+    actually rules that out."""
+    topics = load_curiosity_topics()
+    train_words = set(
+        word.strip(".,").lower()
+        for fact in get_train_facts(topics, "noise")
+        for word in fact.split()
+    )
+    held_out_words = set(
+        word.strip(".,").lower()
+        for fact in get_held_out_facts(topics, "noise")
+        for word in fact.split()
+    )
+    overlap = train_words & held_out_words
+    assert not overlap, f"noise topic's train and held-out facts share word(s): {overlap}"
+
+
 def test_moderate_topic_reconstructs_the_original_ten_warble_facts():
     """Cross-check against Phase 0's already-validated warble content -
     catches a transcription error if the 8 train + 2 held-out facts
