@@ -1,0 +1,22 @@
+[
+  {
+    "name": "human curiosity",
+    "description": "What curiosity is, how it is defined and measured, and what distinguishes genuine learning-driven curiosity from mere novelty-seeking or randomness."
+  },
+  {
+    "name": "agentic behavior",
+    "description": "How autonomous AI agents form goals, make decisions, and act independently rather than simply responding to direct instructions."
+  },
+  {
+    "name": "goal prioritization",
+    "description": "How an agent decides which of several competing goals or tasks to pursue at a given moment, and how that priority changes over time."
+  },
+  {
+    "name": "memory as a predictor",
+    "description": "How a memory of past experience can be used to predict future outcomes, and how measuring prediction error reveals what has and has not really been learned."
+  },
+  {
+    "name": "free will",
+    "description": "Whether a choice made by a deterministic system can be meaningfully described as free, and what the felt experience of choosing has to do with the underlying mechanism that produced it."
+  }
+]
