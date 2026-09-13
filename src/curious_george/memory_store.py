@@ -253,7 +253,7 @@ class MemoryStore:
 
     def resonance(self, topic: str, embedding_method: str, interest_embeddings: Dict[str, torch.Tensor]) -> Optional[float]:
         """Cosine similarity between this item's already-stored
-        embedding and whichever declared interest it's closest to.
+        embedding and whichever of "my interests" it's closest to.
         Deliberately not a stored field - the item's embedding already
         lives in embedding_matrices, and recomputing this on demand from
         it means resonance can never go stale if the declared-interest

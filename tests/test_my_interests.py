@@ -1,10 +1,10 @@
 import torch
 
-from curious_george.declared_interests import load_declared_interests, embed_declared_interests
+from curious_george.my_interests import load_my_interests, embed_my_interests
 
 
 def test_real_content_loads_with_expected_shape():
-    interests = load_declared_interests()
+    interests = load_my_interests()
     assert len(interests) == 5
     names = {entry["name"] for entry in interests}
     assert names == {
@@ -25,13 +25,13 @@ class FakeEmbedder:
         return torch.tensor([float(len(text)), 0.0])
 
 
-def test_embed_declared_interests_embeds_the_description_not_the_name():
+def test_embed_my_interests_embeds_the_description_not_the_name():
     interests = [
         {"name": "short", "description": "a longer description text"},
         {"name": "other", "description": "another description"},
     ]
     embedder = FakeEmbedder()
-    embeddings = embed_declared_interests(interests, embedder)
+    embeddings = embed_my_interests(interests, embedder)
 
     assert set(embeddings.keys()) == {"short", "other"}
     assert embedder.calls == ["a longer description text", "another description"], (
