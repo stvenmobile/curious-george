@@ -62,3 +62,20 @@ def evaluate_recall_probes(model, tokenizer, device, probes: List[Dict[str, str]
             total_accuracy += accuracy
     n = len(probes)
     return total_loss / n, total_accuracy / n
+
+
+def measure_content_loss(model, tokenizer, device, content: str) -> float:
+    """Plain causal-LM loss on `content` as a whole - no prompt/target
+    split, no hand-authored probes needed. Real candidate topics won't
+    arrive with fictional_entities-style pre-built probes the way
+    Phase 0/1's fixtures did; this is "how surprised is the model by
+    this, right now," the cheap baseline measurement used to place a
+    brand-new candidate on the mastery axis before any study step.
+
+    Same self-supervised loss finetune_lora trains against
+    (labels=input_ids, letting the model shift internally) - just
+    measured here under no_grad instead of trained on."""
+    ids = tokenizer(content, return_tensors="pt", add_special_tokens=False).input_ids.to(device)
+    with torch.no_grad():
+        outputs = model(input_ids=ids, attention_mask=torch.ones_like(ids), labels=ids)
+    return outputs.loss.item()

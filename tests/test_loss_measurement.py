@@ -1,6 +1,6 @@
 import torch
 
-from curious_george.loss_measurement import compute_probe_loss, evaluate_recall_probes
+from curious_george.loss_measurement import compute_probe_loss, evaluate_recall_probes, measure_content_loss
 
 VOCAB_SIZE = 20
 PROMPT_LEN = 3
@@ -115,3 +115,33 @@ def test_evaluate_recall_probes_averages_correctly_across_probes():
     assert avg_accuracy == 0.5, f"expected averaged accuracy of exactly 0.5 (one perfect, one zero), got {avg_accuracy}"
     expected_avg_loss = (loss.item() + loss2.item()) / 2
     assert abs(avg_loss - expected_avg_loss) < 1e-6, f"expected averaged loss {expected_avg_loss}, got {avg_loss}"
+
+
+def test_measure_content_loss_tokenizes_without_special_tokens_and_uses_labels_equal_input_ids():
+    class FakeTokenizerForContent:
+        def __call__(self, text, return_tensors="pt", add_special_tokens=False):
+            assert add_special_tokens is False
+            ids = [ord(c) % 50 for c in text]
+            return FakeBatchEncoding(input_ids=torch.tensor([ids], dtype=torch.long))
+
+    class FakeModelWithLoss:
+        def __init__(self):
+            self.last_call = None
+
+        def __call__(self, input_ids, attention_mask, labels):
+            assert torch.equal(labels, input_ids), "plain causal-LM loss needs labels == input_ids"
+            assert torch.equal(attention_mask, torch.ones_like(input_ids)), "no padding here - every token is real"
+            self.last_call = {"input_ids": input_ids}
+
+            class FakeOutputs:
+                loss = input_ids.float().mean()
+
+            return FakeOutputs()
+
+    model = FakeModelWithLoss()
+    loss = measure_content_loss(model, FakeTokenizerForContent(), "cpu", "abc")
+
+    expected_ids = torch.tensor([[ord(c) % 50 for c in "abc"]], dtype=torch.long)
+    assert model.last_call["input_ids"].tolist() == expected_ids.tolist()
+    assert abs(loss - expected_ids.float().mean().item()) < 1e-6
+    assert isinstance(loss, float), "should return a plain float, not a tensor"
