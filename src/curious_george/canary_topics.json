@@ -1,0 +1,41 @@
+{
+  "lighthouse_keeping": {
+    "description": "The history and daily practice of staffing and maintaining coastal lighthouses.",
+    "probes": [
+      {"prompt": "Lighthouse keepers were responsible for maintaining the light and fog", "target": " signals through the night."},
+      {"prompt": "Before electricity, lighthouse lamps burned whale oil or", "target": " kerosene to produce light."},
+      {"prompt": "A Fresnel lens uses concentric rings of glass to focus a lighthouse's", "target": " beam over long distances."},
+      {"prompt": "Many lighthouses were automated in the twentieth century, ending the need for a resident", "target": " keeper."},
+      {"prompt": "Lighthouse keepers often lived in isolated conditions for months at a", "target": " time."},
+      {"prompt": "Each lighthouse has a unique flashing pattern so sailors can identify it at", "target": " night."},
+      {"prompt": "Fog signals such as horns and bells warned ships away from rocky coastlines in poor", "target": " visibility."},
+      {"prompt": "The tallest lighthouses were built on dangerous shoals far from", "target": " shore."}
+    ]
+  },
+  "vintage_typewriters": {
+    "description": "The mechanics, history, and restoration of manual typewriters.",
+    "probes": [
+      {"prompt": "A typewriter's typebars strike an inked ribbon to print each character onto", "target": " paper."},
+      {"prompt": "The QWERTY keyboard layout was designed partly to reduce jamming of mechanical", "target": " typebars."},
+      {"prompt": "Pressing the carriage return lever advances the paper to the next", "target": " line."},
+      {"prompt": "A typewriter ribbon dries out over time and must eventually be", "target": " replaced."},
+      {"prompt": "Manual typewriters require no electricity, relying entirely on the typist's own", "target": " force."},
+      {"prompt": "The bell on a typewriter rings to warn the typist that the margin is", "target": " near."},
+      {"prompt": "Portable typewriters became popular with travelers and journalists in the twentieth", "target": " century."},
+      {"prompt": "Collectors often restore vintage typewriters by cleaning the typebars and replacing worn rubber", "target": " platens."}
+    ]
+  },
+  "traditional_knots": {
+    "description": "Traditional rope-knotting techniques used by sailors, climbers, and fishermen.",
+    "probes": [
+      {"prompt": "A bowline knot forms a fixed loop that will not slip or tighten under", "target": " load."},
+      {"prompt": "Sailors traditionally used a clove hitch to quickly secure a rope to a", "target": " post."},
+      {"prompt": "A square knot joins two ropes of similar thickness for a simple, temporary", "target": " bind."},
+      {"prompt": "The figure-eight knot is often tied at the end of a rope to prevent it from slipping through a", "target": " pulley."},
+      {"prompt": "Climbers rely on precisely tied knots because a failure can be life", "target": " threatening."},
+      {"prompt": "A taut-line hitch can be slid to adjust tension while still holding firm under", "target": " load."},
+      {"prompt": "Fishermen use a variety of specialized knots to attach hooks and lures securely to a", "target": " line."},
+      {"prompt": "A well-tied knot should be easy to untie again after bearing a heavy", "target": " load."}
+    ]
+  }
+}
