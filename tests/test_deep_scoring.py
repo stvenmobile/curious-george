@@ -13,23 +13,27 @@ def _record(ratio_mean):
     )
 
 
-def test_run_deep_scoring_pass_promotes_positive_and_prunes_negative(monkeypatch):
+def _fake_scorer_by_content(store, fake_records: dict):
+    """fake_records maps topic -> DeepScoreRecord; deep_score_topic only
+    ever sees content, so this looks up which topic a piece of content
+    belongs to."""
+    def fake_deep_score_topic(model_name, device, content, **kwargs):
+        for topic, record in fake_records.items():
+            if store.get_item(topic).content == content:
+                return record
+        raise AssertionError(f"unexpected content passed to deep_score_topic: {content!r}")
+    return fake_deep_score_topic
+
+
+def test_run_deep_scoring_pass_keeps_only_top_n_by_rank(monkeypatch):
     store = MemoryStore()
     store.add_or_update_item("good_topic", "content about something structured", {"m": torch.tensor([1.0, 0.0])})
     store.add_or_update_item("bad_topic", "content that turns out to be noise", {"m": torch.tensor([0.0, 1.0])})
 
     fake_records = {"good_topic": _record(0.25), "bad_topic": _record(-0.30)}
+    monkeypatch.setattr(deep_scoring_module, "deep_score_topic", _fake_scorer_by_content(store, fake_records))
 
-    def fake_deep_score_topic(model_name, device, content, **kwargs):
-        # identify which topic by content, since deep_score_topic only sees content
-        for topic, record in fake_records.items():
-            if store.get_item(topic).content == content:
-                return record
-        raise AssertionError(f"unexpected content passed to deep_score_topic: {content!r}")
-
-    monkeypatch.setattr(deep_scoring_module, "deep_score_topic", fake_deep_score_topic)
-
-    results = run_deep_scoring_pass(store, "fake-model", "cpu")
+    results = run_deep_scoring_pass(store, "fake-model", "cpu", keep_top_n=1)
 
     assert results["good_topic"]["outcome"] == "active"
     assert results["bad_topic"]["outcome"] == "pruned"
@@ -40,11 +44,43 @@ def test_run_deep_scoring_pass_promotes_positive_and_prunes_negative(monkeypatch
     assert len(store) == 1
 
 
-def test_run_deep_scoring_pass_prunes_when_ratio_is_none(monkeypatch):
+def test_run_deep_scoring_pass_keeps_top_n_across_more_than_two_candidates(monkeypatch):
+    store = MemoryStore()
+    store.add_or_update_item("best", "content best", {"m": torch.tensor([1.0, 0.0])})
+    store.add_or_update_item("middle", "content middle", {"m": torch.tensor([0.0, 1.0])})
+    store.add_or_update_item("worst", "content worst", {"m": torch.tensor([1.0, 1.0])})
+
+    fake_records = {"best": _record(0.30), "middle": _record(-0.02), "worst": _record(-0.10)}
+    monkeypatch.setattr(deep_scoring_module, "deep_score_topic", _fake_scorer_by_content(store, fake_records))
+
+    results = run_deep_scoring_pass(store, "fake-model", "cpu", keep_top_n=2)
+
+    assert results["best"]["outcome"] == "active"
+    assert results["middle"]["outcome"] == "active"
+    assert results["worst"]["outcome"] == "pruned", "lowest-ranked of the three should be the one cut at N=2"
+
+
+def test_run_deep_scoring_pass_keeps_every_measurable_item_when_keep_top_n_is_none(monkeypatch):
+    """The default (None) applies no relative-rank pruning at all - only
+    the hard unmeasurable rule below applies. Useful when there isn't
+    yet enough real data to pick a defensible N; even a negative-ratio
+    item survives as long as it was actually measurable."""
+    store = MemoryStore()
+    store.add_or_update_item("mildly_negative", "content", {"m": torch.tensor([1.0, 0.0])})
+    monkeypatch.setattr(deep_scoring_module, "deep_score_topic", lambda *a, **k: _record(-0.05))
+
+    results = run_deep_scoring_pass(store, "fake-model", "cpu")  # keep_top_n defaults to None
+
+    assert results["mildly_negative"]["outcome"] == "active"
+    assert store.get_item("mildly_negative").status == PipelineStatus.ACTIVE
+
+
+def test_run_deep_scoring_pass_prunes_unmeasurable_regardless_of_top_n(monkeypatch):
     """A None ratio means memorization_progress never even went
     positive - training didn't help the model predict its own content,
-    a worse sign than a merely-negative-but-measurable ratio. Should be
-    pruned, not kept on the technicality that None < 0.0 is False."""
+    a worse sign than a merely-negative-but-measurable ratio. Always
+    pruned, even with a generous keep_top_n and even when it's the only
+    candidate being scored."""
     store = MemoryStore()
     store.add_or_update_item("unmeasurable_topic", "content", {"m": torch.tensor([1.0, 0.0])})
 
@@ -55,7 +91,7 @@ def test_run_deep_scoring_pass_prunes_when_ratio_is_none(monkeypatch):
     )
     monkeypatch.setattr(deep_scoring_module, "deep_score_topic", lambda *a, **k: unmeasurable_record)
 
-    results = run_deep_scoring_pass(store, "fake-model", "cpu")
+    results = run_deep_scoring_pass(store, "fake-model", "cpu", keep_top_n=10)
     assert results["unmeasurable_topic"]["outcome"] == "pruned"
     assert not store.has_topic("unmeasurable_topic")
 

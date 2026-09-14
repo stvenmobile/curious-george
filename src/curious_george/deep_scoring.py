@@ -96,16 +96,33 @@ def deep_score_topic(model_name: str, device: str, content: str, num_trials: int
 
 
 def run_deep_scoring_pass(store: MemoryStore, model_name: str, device: str,
-                           prune_ratio_threshold: float = 0.0,
+                           keep_top_n: Optional[int] = None,
                            num_trials: int = 5, num_steps: int = 200, learning_rate: float = 1e-4,
                            topics: Optional[List[str]] = None) -> Dict[str, dict]:
     """Deep-scores every requested topic (defaults to every CANDIDATE-
-    status item in the store - the ones never yet deep-scored) and
-    applies the prune-or-promote decision: a mean generalization ratio
-    below prune_ratio_threshold (or unmeasurable - memorization_progress
-    never even went positive, itself a bad sign) removes the item
-    entirely; anything else gets promoted to ACTIVE, eligible for
-    idle-time selection.
+    status item in the store - the ones never yet deep-scored), then
+    ranks by mean generalization ratio and keeps only the top
+    `keep_top_n` - everything else is pruned.
+
+    This replaced an earlier absolute-threshold version (prune anything
+    below 0.0) after a real batch of non-fixture candidates showed why
+    that doesn't work: canary-based scoring measures transfer against a
+    fixed, UNRELATED sibling rather than a domain-matched one (see
+    canary_topics.py), and real, isolated content without a deliberately
+    matched partner tends to show modest negative transfer almost across
+    the board - the same thing Phase 1's own "known" category showed.
+    An absolute zero cutoff pruned an entire real batch even though the
+    ranking within it was genuinely informative (one candidate was an
+    order of magnitude less negative than the other two). Relative
+    ranking surfaces that signal; an absolute cutoff throws it away.
+
+    Two things ALWAYS get pruned regardless of rank: an unmeasurable
+    ratio (memorization_progress never even went positive - a red flag
+    about the trial itself, not just "worse than its peers"), and,
+    naturally, anything that doesn't make the top_n cut. Passing
+    keep_top_n=None keeps every measurable item (only the unmeasurable
+    ones get pruned) - useful when there isn't yet enough real data to
+    pick a defensible N.
 
     Deliberately does not archive anything here - archiving (mastered,
     no new sources currently available) is a judgment about mastery and
@@ -120,7 +137,7 @@ def run_deep_scoring_pass(store: MemoryStore, model_name: str, device: str,
         topics = [item.topic for item in store.items if item.status == PipelineStatus.CANDIDATE]
 
     canary_probes = all_canary_probes(load_canary_topics())
-    results = {}
+    records: Dict[str, DeepScoreRecord] = {}
 
     for topic in topics:
         item = store.get_item(topic)
@@ -128,16 +145,19 @@ def run_deep_scoring_pass(store: MemoryStore, model_name: str, device: str,
                                    num_steps=num_steps, learning_rate=learning_rate,
                                    canary_probes=canary_probes)
         store.record_deep_score(topic, record)
+        records[topic] = record
 
-        should_prune = (
-            record.generalization_ratio_mean is None
-            or record.generalization_ratio_mean < prune_ratio_threshold
-        )
-        if should_prune:
-            store.remove_item(topic)
-            results[topic] = {"outcome": "pruned", "record": record}
-        else:
+    measurable = {t: r for t, r in records.items() if r.generalization_ratio_mean is not None}
+    ranked = sorted(measurable.items(), key=lambda kv: kv[1].generalization_ratio_mean, reverse=True)
+    kept = {t for t, _ in (ranked if keep_top_n is None else ranked[:keep_top_n])}
+
+    results = {}
+    for topic, record in records.items():
+        if topic in kept:
             store.set_status(topic, PipelineStatus.ACTIVE)
             results[topic] = {"outcome": "active", "record": record}
+        else:
+            store.remove_item(topic)
+            results[topic] = {"outcome": "pruned", "record": record}
 
     return results
