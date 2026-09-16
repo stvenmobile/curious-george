@@ -51,7 +51,7 @@ class QwenHiddenStateEmbedder:
     METHOD_NAME = "qwen_hidden"
 
     def __init__(self, model_name: str = "Qwen/Qwen2.5-0.5B-Instruct", layer: int = 18, device: str = "cuda"):
-        from curious_george.extractor import ResidualExtractor
+        from curious_george.curiosity_tools.extractor import ResidualExtractor
         self.extractor = ResidualExtractor(model_name_or_path=model_name, device=device)
         self.layer = layer
 

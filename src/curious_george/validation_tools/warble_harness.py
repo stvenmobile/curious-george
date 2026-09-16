@@ -30,11 +30,11 @@ from pathlib import Path
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from curious_george.memory_store import MemoryStore
-from curious_george.fictional_entities import load_fictional_entities, get_study_facts, get_recall_probes
-from curious_george.embeddings import SmallModelEmbedder, populate_item
-from curious_george.loss_measurement import evaluate_recall_probes
-from curious_george.lora_finetune import finetune_lora
+from curious_george.curiosity_tools.memory_store import MemoryStore
+from curious_george.validation_tools.fictional_entities import load_fictional_entities, get_study_facts, get_recall_probes
+from curious_george.curiosity_tools.embeddings import SmallModelEmbedder, populate_item
+from curious_george.curiosity_tools.loss_measurement import evaluate_recall_probes
+from curious_george.curiosity_tools.lora_finetune import finetune_lora
 
 
 def with_context_probes(probes: list, context_text: str) -> list:

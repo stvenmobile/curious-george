@@ -23,16 +23,16 @@ leaking between trials, at the cost of a few extra seconds per topic to
 reload already-cached weights.
 """
 
-import statistics
 from typing import Dict, Iterable, List, Optional
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from curious_george.curiosity_topics import (
+from curious_george.validation_tools.curiosity_topics import (
     load_curiosity_topics, get_train_facts, get_trained_probes, get_sibling_probes, get_category,
 )
-from curious_george.loss_measurement import evaluate_recall_probes
-from curious_george.lora_finetune import finetune_lora
+from curious_george.curiosity_tools.loss_measurement import evaluate_recall_probes
+from curious_george.curiosity_tools.lora_finetune import finetune_lora
+from curious_george.curiosity_tools.deep_scoring import summarize_trials
 
 
 def run_topic_trial(model_name: str, device: str, topic_name: str, topics: dict = None,
@@ -110,37 +110,6 @@ def run_noise_experiment(model_name: str = "Qwen/Qwen2.5-0.5B-Instruct", device:
               f"{r['generalization_progress']:>15.4f} {ratio_str:>14}")
 
     return results
-
-
-def summarize_trials(trials: List[dict]) -> dict:
-    """Mean/stdev across a list of run_topic_trial results for one
-    topic. stdev needs at least 2 points to be defined; returns 0.0 for
-    a single trial rather than raising, so this stays usable while
-    iterating on trial count. generalization_ratio is excluded from the
-    average on any trial where it was None (memorization_progress <= 0),
-    rather than treating that trial as a 0 - a None ratio means "not
-    meaningful," not "no transfer"."""
-    memorization = [t["memorization_progress"] for t in trials]
-    generalization = [t["generalization_progress"] for t in trials]
-    ratios = [t["generalization_ratio"] for t in trials if t["generalization_ratio"] is not None]
-
-    def mean_and_stdev(values):
-        if not values:
-            return None, None
-        mean = statistics.mean(values)
-        stdev = statistics.stdev(values) if len(values) > 1 else 0.0
-        return mean, stdev
-
-    memorization_mean, memorization_stdev = mean_and_stdev(memorization)
-    generalization_mean, generalization_stdev = mean_and_stdev(generalization)
-    ratio_mean, ratio_stdev = mean_and_stdev(ratios)
-
-    return {
-        "n": len(trials),
-        "memorization_mean": memorization_mean, "memorization_stdev": memorization_stdev,
-        "generalization_mean": generalization_mean, "generalization_stdev": generalization_stdev,
-        "ratio_mean": ratio_mean, "ratio_stdev": ratio_stdev, "ratio_n": len(ratios),
-    }
 
 
 def run_repeated_trials(model_name: str, device: str, topic_name: str, topics: dict = None,

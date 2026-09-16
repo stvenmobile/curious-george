@@ -1,6 +1,6 @@
 import json
 
-from curious_george.fictional_entities import (
+from curious_george.validation_tools.fictional_entities import (
     load_fictional_entities, get_study_facts, get_recall_probes, get_generalization_probes,
 )
 

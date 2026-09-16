@@ -1,6 +1,6 @@
 import torch
 
-from curious_george.my_interests import load_my_interests, embed_my_interests, is_protected_interest
+from curious_george.curiosity_tools.my_interests import load_my_interests, embed_my_interests, is_protected_interest
 
 
 def test_is_protected_interest_matches_real_content():

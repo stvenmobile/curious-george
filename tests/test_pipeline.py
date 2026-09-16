@@ -1,7 +1,7 @@
 import torch
 
-from curious_george.pipeline import add_candidate, add_candidates
-from curious_george.memory_store import MemoryStore, PipelineStatus
+from curious_george.curiosity_tools.pipeline import add_candidate, add_candidates
+from curious_george.curiosity_tools.memory_store import MemoryStore, PipelineStatus
 
 
 class FakeEmbedder:

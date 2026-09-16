@@ -1,4 +1,4 @@
-from curious_george.warble_harness import with_context_probes
+from curious_george.validation_tools.warble_harness import with_context_probes
 
 
 def test_with_context_probes_prepends_context_and_does_not_mutate_input():

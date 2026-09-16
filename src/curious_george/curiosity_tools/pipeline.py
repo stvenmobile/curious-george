@@ -16,8 +16,8 @@ from typing import Dict, List, Optional
 
 import torch
 
-from curious_george.loss_measurement import measure_content_loss
-from curious_george.memory_store import MemoryStore
+from curious_george.curiosity_tools.loss_measurement import measure_content_loss
+from curious_george.curiosity_tools.memory_store import MemoryStore
 
 
 def add_candidate(store: MemoryStore, model, tokenizer, device: str, embedder,

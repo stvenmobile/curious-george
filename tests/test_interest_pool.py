@@ -1,9 +1,9 @@
 import pytest
 
-from curious_george.interest_pool import (
+from curious_george.curiosity_tools.interest_pool import (
     InterestPool, current_value, interest_value, STARTING_VALUE, DECAY_PER_DAY, OPEN_SLOT_CAPACITY,
 )
-from curious_george.my_interests import PROTECTED_VALUE
+from curious_george.curiosity_tools.my_interests import PROTECTED_VALUE
 
 
 def test_below_capacity_every_add_succeeds():
@@ -108,12 +108,12 @@ def test_load_missing_path_returns_empty_pool(tmp_path):
 
 
 def test_interest_value_returns_protected_value_for_one_of_the_original_five(monkeypatch):
-    import curious_george.interest_pool as interest_pool_module
+    import curious_george.curiosity_tools.interest_pool as interest_pool_module
 
     def fake_is_protected(name, interests=None):
         return name == "human curiosity"
 
-    monkeypatch.setattr("curious_george.my_interests.is_protected_interest", fake_is_protected)
+    monkeypatch.setattr("curious_george.curiosity_tools.my_interests.is_protected_interest", fake_is_protected)
 
     pool = InterestPool()
     assert interest_value("human curiosity", pool) == PROTECTED_VALUE
@@ -123,7 +123,7 @@ def test_interest_value_falls_back_to_pool_for_non_protected_names(monkeypatch):
     def fake_is_protected(name, interests=None):
         return False
 
-    monkeypatch.setattr("curious_george.my_interests.is_protected_interest", fake_is_protected)
+    monkeypatch.setattr("curious_george.curiosity_tools.my_interests.is_protected_interest", fake_is_protected)
 
     pool = InterestPool()
     pool.add_interest("topic", "description", now="2026-01-01T00:00:00+00:00")
@@ -134,7 +134,7 @@ def test_interest_value_raises_for_a_name_in_neither_source(monkeypatch):
     def fake_is_protected(name, interests=None):
         return False
 
-    monkeypatch.setattr("curious_george.my_interests.is_protected_interest", fake_is_protected)
+    monkeypatch.setattr("curious_george.curiosity_tools.my_interests.is_protected_interest", fake_is_protected)
 
     pool = InterestPool()
     with pytest.raises(KeyError):

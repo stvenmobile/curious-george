@@ -1,6 +1,6 @@
 import pytest
 
-from curious_george.curiosity import run_topic_trial
+from curious_george.validation_tools.curiosity import run_topic_trial
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 DEVICE = "cpu"

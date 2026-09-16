@@ -1,4 +1,4 @@
-from curious_george.canary_topics import load_canary_topics, get_canary_probes, all_canary_probes
+from curious_george.curiosity_tools.canary_topics import load_canary_topics, get_canary_probes, all_canary_probes
 
 
 def test_real_content_loads_with_expected_shape():
@@ -29,7 +29,7 @@ def test_canary_domains_share_no_thematic_vocabulary_with_declared_interests():
     memory as a predictor, free will) - this just confirms no literal
     word overlap between the two content sets, catching an accidental
     thematic collision if one were ever introduced."""
-    from curious_george.my_interests import load_my_interests
+    from curious_george.curiosity_tools.my_interests import load_my_interests
 
     canary_words = set()
     for probe in all_canary_probes(load_canary_topics()):

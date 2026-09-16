@@ -1,6 +1,6 @@
 import torch
 
-from curious_george.memory_store import (
+from curious_george.curiosity_tools.memory_store import (
     MemoryStore, PipelineStatus, DeepScoreRecord, classify_mastery,
     MASTERY_LOSS_CEILING, NOVICE_LOSS_CEILING,
 )
@@ -149,6 +149,23 @@ def test_restudy_with_unrecognized_embedding_method_raises():
     except ValueError:
         raised = True
     assert raised, "re-study with a never-before-seen embedding method should raise, not silently misalign matrices"
+
+
+def test_mark_studied_updates_last_studied_and_raises_for_unknown_topic():
+    store = MemoryStore()
+    item = store.add_or_update_item("topic", "content", {"m": torch.tensor([1.0, 0.0])})
+    original_last_studied = item.last_studied
+
+    store.mark_studied("topic", now="2030-01-01T00:00:00+00:00")
+    assert store.get_item("topic").last_studied == "2030-01-01T00:00:00+00:00"
+    assert store.get_item("topic").last_studied != original_last_studied
+
+    try:
+        store.mark_studied("nonexistent")
+        raised = False
+    except KeyError:
+        raised = True
+    assert raised, "marking an unknown topic as studied should raise, not silently no-op"
 
 
 def test_classify_mastery_uses_the_named_thresholds():

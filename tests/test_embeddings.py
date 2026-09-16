@@ -1,7 +1,7 @@
 import torch
 
-from curious_george.embeddings import SmallModelEmbedder, QwenHiddenStateEmbedder, populate_item
-from curious_george.memory_store import MemoryStore
+from curious_george.curiosity_tools.embeddings import SmallModelEmbedder, QwenHiddenStateEmbedder, populate_item
+from curious_george.curiosity_tools.memory_store import MemoryStore
 
 
 def test_small_model_embedder_shape_dtype_and_semantic_sanity():
@@ -46,7 +46,7 @@ def test_qwen_hidden_state_embedder_calls_extractor_correctly(monkeypatch):
             (layer,) = target_layers
             return {layer: torch.tensor([1.0, 2.0, 3.0], dtype=torch.float16)}  # half precision, like the real one
 
-    import curious_george.extractor as extractor_module
+    import curious_george.curiosity_tools.extractor as extractor_module
     monkeypatch.setattr(extractor_module, "ResidualExtractor", FakeResidualExtractor)
 
     qwen_embedder = QwenHiddenStateEmbedder(model_name="fake-model", layer=18, device="cpu")

@@ -1,6 +1,6 @@
 import torch
 
-from curious_george.loss_measurement import compute_probe_loss, evaluate_recall_probes, measure_content_loss
+from curious_george.curiosity_tools.loss_measurement import compute_probe_loss, evaluate_recall_probes, measure_content_loss
 
 VOCAB_SIZE = 20
 PROMPT_LEN = 3

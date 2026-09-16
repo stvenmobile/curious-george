@@ -32,7 +32,7 @@ real track record to tune against.
 
 from typing import Dict, List, Optional, Tuple
 
-from curious_george.memory_store import DeepScoreRecord, MemoryStore, PipelineStatus
+from curious_george.curiosity_tools.memory_store import DeepScoreRecord, MemoryStore, PipelineStatus
 
 RESONANCE_WEIGHT = 1.0
 MASTERY_PENALTY = 10.0

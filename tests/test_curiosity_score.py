@@ -1,7 +1,7 @@
 import torch
 
-from curious_george.curiosity_score import curiosity_score, score_topic, rank_candidates
-from curious_george.memory_store import MemoryStore, PipelineStatus, DeepScoreRecord
+from curious_george.curiosity_tools.curiosity_score import curiosity_score, score_topic, rank_candidates
+from curious_george.curiosity_tools.memory_store import MemoryStore, PipelineStatus, DeepScoreRecord
 
 
 def _deep_score(generalization_mean, generalization_ratio_mean=None):

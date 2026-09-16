@@ -1,8 +1,8 @@
 import torch
 
-from curious_george.deep_scoring import run_deep_scoring_pass
-from curious_george.memory_store import MemoryStore, PipelineStatus, DeepScoreRecord
-import curious_george.deep_scoring as deep_scoring_module
+from curious_george.curiosity_tools.deep_scoring import run_deep_scoring_pass
+from curious_george.curiosity_tools.memory_store import MemoryStore, PipelineStatus, DeepScoreRecord
+import curious_george.curiosity_tools.deep_scoring as deep_scoring_module
 
 
 def _record(ratio_mean):

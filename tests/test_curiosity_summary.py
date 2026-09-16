@@ -1,4 +1,4 @@
-from curious_george.curiosity import summarize_trials
+from curious_george.curiosity_tools.deep_scoring import summarize_trials
 
 
 def _trial(memorization, generalization, ratio):

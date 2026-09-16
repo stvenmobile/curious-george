@@ -1,7 +1,7 @@
 import pytest
 
-from curious_george.deep_scoring import deep_score_trial, deep_score_topic
-from curious_george.canary_topics import load_canary_topics, all_canary_probes
+from curious_george.curiosity_tools.deep_scoring import deep_score_trial, deep_score_topic
+from curious_george.curiosity_tools.canary_topics import load_canary_topics, all_canary_probes
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 DEVICE = "cpu"

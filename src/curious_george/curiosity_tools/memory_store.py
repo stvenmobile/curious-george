@@ -238,6 +238,16 @@ class MemoryStore:
         latest_loss = item.loss_history[-1][1]
         return first_loss - latest_loss
 
+    def mark_studied(self, topic: str, now: Optional[str] = None) -> None:
+        """Updates last_studied directly, for a real study event (see
+        study.py) - distinct from add_or_update_item's own "re-study"
+        semantics, which are about refreshed CONTENT, not a real LoRA
+        study session against unchanged content."""
+        idx = self._topic_to_index.get(topic)
+        if idx is None:
+            raise KeyError(f"no memory item for topic {topic!r}")
+        self.items[idx].last_studied = now or _now_iso()
+
     def mastery_level(self, topic: str) -> Optional[str]:
         """newbie/novice/master from the item's most recent loss
         reading. None if the item has never had a loss measurement at

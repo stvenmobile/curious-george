@@ -2,8 +2,8 @@ import pytest
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from curious_george.lora_finetune import finetune_lora
-from curious_george.loss_measurement import evaluate_recall_probes
+from curious_george.curiosity_tools.lora_finetune import finetune_lora
+from curious_george.curiosity_tools.loss_measurement import evaluate_recall_probes
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 DEVICE = "cpu"

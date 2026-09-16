@@ -1,6 +1,6 @@
 import pytest
 
-from curious_george.curiosity_topics import (
+from curious_george.validation_tools.curiosity_topics import (
     load_curiosity_topics, get_category, get_train_facts, get_trained_probes,
     get_sibling_facts, get_sibling_probes, _validate_no_train_sibling_overlap,
 )
@@ -85,7 +85,7 @@ def test_moderate_topic_matches_phase_0s_original_warbles_and_quaddles():
     be exactly the 10 original warble facts, and its sibling should be
     exactly the original quaddle content, not an independent copy that
     could have drifted."""
-    from curious_george.fictional_entities import load_fictional_entities, get_study_facts, get_recall_probes
+    from curious_george.validation_tools.fictional_entities import load_fictional_entities, get_study_facts, get_recall_probes
 
     topics = load_curiosity_topics()
     entities = load_fictional_entities()

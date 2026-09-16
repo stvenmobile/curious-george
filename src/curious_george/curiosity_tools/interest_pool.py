@@ -73,7 +73,7 @@ def interest_value(name: str, pool: "InterestPool", now: Optional[str] = None) -
     PROTECTED_VALUE (99, static) for one of the original 5, else this
     pool's decaying current_value. Raises if `name` is neither, since
     that means it isn't a real interest at all under either source."""
-    from curious_george.my_interests import PROTECTED_VALUE, is_protected_interest
+    from curious_george.curiosity_tools.my_interests import PROTECTED_VALUE, is_protected_interest
 
     if is_protected_interest(name):
         return PROTECTED_VALUE
