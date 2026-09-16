@@ -1,6 +1,12 @@
 import torch
 
-from curious_george.my_interests import load_my_interests, embed_my_interests
+from curious_george.my_interests import load_my_interests, embed_my_interests, is_protected_interest
+
+
+def test_is_protected_interest_matches_real_content():
+    assert is_protected_interest("human curiosity")
+    assert is_protected_interest("free will")
+    assert not is_protected_interest("sourdough starters")
 
 
 def test_real_content_loads_with_expected_shape():
