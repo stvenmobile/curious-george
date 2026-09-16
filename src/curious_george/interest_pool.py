@@ -2,17 +2,22 @@
 The bounded, self-curating pool of resonance anchors beyond the
 original 5 protected interests.
 
-See obsidian/Journals/2026-09-16.md for the design discussion. The
-original 5 (my_interests.json/.py) are permanently protected and never
-decay - this module never touches them. Anything added here starts at
-STARTING_VALUE (60) and loses DECAY_PER_DAY (1) point per day since its
-last real study event (not merely being matched/considered) - roughly
-two months to fully decay to zero if never studied again. Capacity is
-OPEN_SLOT_CAPACITY (5) - together with the 5 protected interests, 10
-total. A new candidate can only displace the weakest current entry if
-it currently outranks it - a fresh arrival (value 60) beats anything
-that has decayed at all, and ties (both at 60, e.g. both added/studied
-today) are not evicted.
+TOTAL effective capacity across BOTH sources is 10: 5 static, protected
+interests assigned externally as initial research goals
+(my_interests.json/.py - this module never touches them, they never
+decay), plus OPEN_SLOT_CAPACITY (5) dynamic slots managed here - room
+for candidates to surface either as external "suggestions" or, down the
+road, from something Piper generates internally during her own research
+activity. Nothing generates that second kind yet; the capacity is
+reserved for it regardless, per obsidian/Journals/2026-09-16.md.
+
+Anything added here starts at STARTING_VALUE (60) and loses
+DECAY_PER_DAY (1) point per day since its last real study event (not
+merely being matched/considered) - roughly two months to fully decay to
+zero if never studied again. A new candidate can only displace the
+weakest current entry if it currently outranks it - a fresh arrival
+(value 60) beats anything that has decayed at all, and ties (both at
+60, e.g. both added/studied today) are not evicted.
 
 The promotion trigger is deliberately NOT automatic. There's no
 autonomous pipeline process calling add_interest - for now it's called
