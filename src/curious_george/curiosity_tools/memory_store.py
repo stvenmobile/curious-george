@@ -105,15 +105,23 @@ class PipelineStatus(str, Enum):
     selection.
     ACTIVE - deep-scored at least once; currently eligible for
     idle-time selection.
+    SHELVED - deep-scored and genuinely measurable, but displaced from
+    the active tier's bounded capacity by something that currently
+    outranks it (see research_trigger.py's ACTIVE_CAPACITY) - outcompeted,
+    not disproven. Keeps its full deep-score history and can return to
+    ACTIVE later (e.g. a rescore, or room opening up), unlike removal.
     ARCHIVED - mastered, with no new information sources currently
     available to push further; kept, but no longer competing.
 
     Deliberately no PRUNED value here - an item whose deep score reveals
     it's noise doesn't get relabeled, it gets removed from the store
     entirely (see MemoryStore.remove_item). Marking-then-removing would
-    just be two steps where one does the job."""
+    just be two steps where one does the job. SHELVED is different from
+    that: the item's own signal was fine, it just lost a capacity
+    contest, so removal would be the wrong call."""
     CANDIDATE = "candidate"
     ACTIVE = "active"
+    SHELVED = "shelved"
     ARCHIVED = "archived"
 
 

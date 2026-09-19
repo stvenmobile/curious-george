@@ -107,49 +107,42 @@ mastery actually accumulating over calendar time. True accumulation needs
 an open, deliberately deferred question resolved: whether real study should
 ever persist into a shared, evolving model.
 
-None of this *is* autonomous curiosity yet. It's the full set of instruments
-curiosity needs — cheap and expensive scoring, a combined ranking function,
-and a real study mechanism — with a human still deciding which candidates
-to propose and when to call each piece. The next phase is closing that loop.
+**The RESEARCH trigger (`research_trigger.py`) — the loop, closed.** One
+function, `run_research_trigger`, that actually runs the cycle above
+end to end: ingest new candidates from `suggestions.json` (human-curated,
+see `suggestions.py`) → cheap-score them → deep-score every `CANDIDATE` not
+yet scored → enforce the active tier's bounded capacity (`ACTIVE_CAPACITY`
+= 5, mirroring the "~5 attention threads" framing in
+`obsidian/Journals/2026-09-13.md` — this bounded `ACTIVE` set *is* "the
+interest pipeline," `MemoryStore` as a whole is the unbounded memory store)
+via `curiosity_score`, shelving whatever's displaced rather than deleting
+it (`PipelineStatus.SHELVED`) → pick what to study via a breadth-then-depth
+policy (explore every `newbie` topic, strict rotation, before favoring
+`curiosity_score`-ranked depth) → `study_topic` for a caller-specified
+`num_steps` → log the run to `data/research_log/`. A caller can also pass
+an explicit `topic`, a human-directed override that skips straight to
+studying that (already-`ACTIVE`) topic. See
+`obsidian/Journals/2026-09-19.md` for the four design questions this
+resolved (capacity tier, the "what to research"/"intended duration"
+parameters, and the selection policy) and why each landed where it did.
+
+None of this *is* autonomous curiosity yet — a human still decides what
+goes in `suggestions.json` and when the trigger fires — but the mechanism
+itself now runs as one real cycle instead of isolated, manually-sequenced
+calls.
 
 ## Roadmap
 
-**Now — close the loop, and build the MCP server in parallel.** These two
-were originally sequenced (close the loop here first, integrate later), but
-are now deliberately running side by side: waiting for a fully closed
+**Now — `piper_assistant` becomes the MCP client.** The loop is closed and
+the MCP server exposes it (`run_research_trigger`, alongside the
+primitives), so this is no longer blocked on anything in this repo. This
+was deliberately pulled forward to run in parallel with the loop-closing
+work above rather than strictly after it — waiting for a fully closed
 autonomous loop before starting any `piper_assistant` work risked spending
 too much time fine-tuning this repo before the integration that actually
-matters gets started. The two threads:
+matters gets started.
 
-- *Close the loop.* Candidate generation is still entirely manual (every
-  candidate so far has been hand-typed for testing). The pieces above need
-  to compose into an actual cycle: propose candidates → cheap-score →
-  deep-score → `rank_candidates` → `study_topic` on the winner →
-  re-deep-score to check whether it's nearing its mastery limit → archive or
-  continue. The **RESEARCH trigger** (the thing that actually runs this
-  cycle, named after the `LISTENING`/`RESEARCH` state-machine split below)
-  has real open design questions, not yet resolved: whether pipeline
-  capacity is enforced at the candidate tier or the active tier, whether a
-  new `PipelineStatus.SHELVED` value is needed so a displaced-but-still-good
-  item is demoted rather than deleted, what the trigger's "what to
-  research" and "intended duration" parameters actually mean, and how a
-  breadth-then-depth selection policy (explore every `newbie` topic before
-  favoring `curiosity_score`) decides "breadth achieved" and whether
-  newbie-phase selection should be resonance-weighted or strict rotation.
-- *Build the MCP server surface.* `curiosity_tools/mcp_server.py` (new,
-  see Repo layout and "Running the MCP server" below) — a real, running MCP
-  server exposing the current primitives (`add_candidate_topic`,
-  `run_deep_scoring`, `rank_active_topics`, `study_topic`, plus
-  `list_topics`/`get_topic` for introspection) as MCP tools. Deliberately
-  does *not* yet expose a `research_trigger` tool — that's the RESEARCH
-  trigger design work above, still unresolved, and inventing its policy
-  just to fill out the MCP surface would mean building it twice. Exposing
-  the primitives now means `piper_assistant`'s client side and state
-  machine can be built and tested against a real server today, without
-  blocking on that design landing first; a `research_trigger` (or
-  `select_next_topic`) tool gets added to this same server once it does.
-
-**Then — `piper_assistant` becomes the MCP client.** `piper_assistant`
+`piper_assistant`
 (Jetson) adds an MCP client and a supervisory state machine (`LISTENING` vs.
 `RESEARCH` mode) that calls the server above during idle time. This is
 `piper_assistant`'s own repo and its own branch — not a new repo — since
@@ -190,11 +183,6 @@ disconnected facts.
 - Autonomous candidate generation — every candidate has been human-proposed
   so far; an autonomous "notice something worth being curious about"
   mechanism is unbuilt and unscoped.
-- A `research_trigger` MCP tool (or any other orchestration policy exposed
-  over MCP) before the RESEARCH trigger's design questions above are
-  resolved — the primitives are exposed now so `piper_assistant`'s client
-  side isn't blocked, but inventing the selection policy just to fill out
-  the surface would mean building it twice.
 - Any actual code changes in `piper_assistant` itself — that's tracked in
   that repo, on its own branch, once this repo's MCP server surface is
   stable enough to build a client against.
@@ -204,6 +192,16 @@ disconnected facts.
   here.
 - Multi-topic simultaneous LoRA training — one adapter per study step, kept
   deliberately simple.
+- A single RESEARCH trigger call studying more than one topic — one topic
+  per call, deliberately, to avoid an unneeded scheduling problem (which
+  topic first, with what leftover budget) before there's a real need for it.
+- Any richer measure of "depth of understanding" than the existing
+  loss-threshold `mastery` (distinct-token breadth, cross-source overlap/
+  "solidity," etc.) — a real candidate hypothesis exists (see
+  `obsidian/Journals/2026-09-19.md`) but needs `MemoryItem.content` to
+  become multiple sourced passages instead of one string, which needs real
+  search/retrieval to be worth building — the same gap as the
+  mastery-of-broad-topics deferral above, not a new one.
 
 ## Repo layout
 
@@ -228,6 +226,8 @@ src/curious_george/
     deep_scoring.py              expensive transferability check + top-N prune/promote pass
     curiosity_score.py           combines mastery + resonance + transferability into one ranking
     study.py                     a real, committed LoRA study session (not a disposable trial)
+    suggestions.py / .json       human-curated candidate topics - the RESEARCH trigger's input queue
+    research_trigger.py          closes the loop: propose -> score -> select -> study -> log, one call
     mcp_server.py                MCP server wrapper - the service-shape boundary for piper_assistant
   validation_tools/           proved the mechanism works - not needed once trusted
     fictional_entities.py / .json  warbles/quaddles - Phase 0's fabricated ground truth
@@ -297,6 +297,10 @@ environment-variable convention `CURIOUS_GEORGE_MEMORY_DIR` already uses:
   server starts with an empty store)
 
 Tools exposed: `list_topics`, `get_topic`, `add_candidate_topic`,
-`run_deep_scoring`, `rank_active_topics`, `study_topic` — the current
-primitives, unchanged in behavior from calling them directly in Python.
-No `research_trigger` tool yet; see the roadmap above for why.
+`run_deep_scoring`, `rank_active_topics`, `study_topic` — the primitives,
+unchanged in behavior from calling them directly in Python — plus
+`run_research_trigger`, the one call meant to be used day to day: it runs
+the whole propose → score → select → study → log cycle itself (or, given
+an explicit `topic`, studies exactly that one instead). See
+`research_trigger.py` and the "What's been built" section above for what
+it actually does.

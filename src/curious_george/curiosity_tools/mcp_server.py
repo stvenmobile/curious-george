@@ -38,7 +38,7 @@ from typing import Dict, List, Optional
 from mcp.server.mcpserver import MCPServer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from curious_george.curiosity_tools import curiosity_score, deep_scoring, pipeline, study
+from curious_george.curiosity_tools import curiosity_score, deep_scoring, pipeline, research_trigger, study
 from curious_george.curiosity_tools.embeddings import SmallModelEmbedder
 from curious_george.curiosity_tools.memory_store import MemoryItem, MemoryStore, PipelineStatus
 from curious_george.curiosity_tools.my_interests import embed_my_interests, load_my_interests
@@ -107,8 +107,9 @@ def _serialize_item(item: MemoryItem, include_content: bool = True) -> dict:
 @mcp.tool()
 def list_topics(status: Optional[str] = None) -> List[dict]:
     """Lists every topic in the memory store, optionally filtered to one
-    PipelineStatus ("candidate", "active", or "archived"). Content is
-    truncated in this list view - use get_topic for the full text."""
+    PipelineStatus ("candidate", "active", "shelved", or "archived").
+    Content is truncated in this list view - use get_topic for the full
+    text."""
     store = _store()
     items = store.items
     if status is not None:
@@ -189,6 +190,29 @@ def study_topic(topic: str, num_steps: int = 200, learning_rate: float = 1e-4) -
     no-op'd."""
     result = study.study_topic(_store(), MODEL_NAME, DEVICE, topic,
                                 num_steps=num_steps, learning_rate=learning_rate)
+    _store().save()
+    return result
+
+
+@mcp.tool()
+def run_research_trigger(topic: Optional[str] = None, num_steps: int = 200,
+                          short_name: Optional[str] = None) -> dict:
+    """The RESEARCH trigger (see research_trigger.py): the one tool meant
+    to be called during Piper's RESEARCH mode. With topic=None (the
+    default), it proposes new candidates from suggestions.json, deep-
+    scores anything not yet deep-scored, enforces the active-tier capacity
+    (ACTIVE_CAPACITY=5, shelving whatever's displaced), picks what to
+    study via the breadth-then-depth policy, studies it for num_steps, and
+    logs the run to data/research_log/. Pass topic to instead study that
+    exact "active" topic directly, skipping all of the above - a human-
+    directed override, not the default path. This is also the slowest
+    tool here when topic=None and there are new/unscored candidates -
+    deep-scoring runs inline before selection."""
+    result = research_trigger.run_research_trigger(
+        _store(), _state["model"], _state["tokenizer"], MODEL_NAME, DEVICE, _state["embedder"],
+        interest_embeddings=_state["interest_embeddings"],
+        topic=topic, num_steps=num_steps, short_name=short_name,
+    )
     _store().save()
     return result
 
