@@ -114,30 +114,62 @@ to propose and when to call each piece. The next phase is closing that loop.
 
 ## Roadmap
 
-**Now — close the loop.** Candidate generation is still entirely manual
-(every candidate so far has been hand-typed for testing). The pieces above
-need to compose into an actual cycle: propose candidates → cheap-score →
-deep-score → `rank_candidates` → `study_topic` on the winner → re-deep-score
-to check whether it's nearing its mastery limit → archive or continue. This
-is the thing that would make the whole mechanism worth observing running on
-its own, rather than as isolated, manually-invoked tools.
+**Now — close the loop, and build the MCP server in parallel.** These two
+were originally sequenced (close the loop here first, integrate later), but
+are now deliberately running side by side: waiting for a fully closed
+autonomous loop before starting any `piper_assistant` work risked spending
+too much time fine-tuning this repo before the integration that actually
+matters gets started. The two threads:
 
-**Then — `piper_assistant` integration, as an MCP server.** The natural
-end-state: `curiosity_tools` (see Repo layout) becomes an MCP tool surface,
-`piper_assistant` (Jetson) becomes a thin MCP client, and Piper's supervisory
-state machine (a `LISTENING` vs. `RESEARCH` mode, sketched in
-`obsidian/Journals/` but not yet built) drives the loop during idle time.
-Two real architectural differences from how this repo runs today, identified
-before starting rather than discovered partway through: (1) current
-functions take a live model/tokenizer/embedder as parameters — a library
-shape, not a service shape; an MCP server needs a thin wrapper that owns the
-model internally and exposes tools taking only plain, JSON-serializable
-data. (2) Every trial here reloads the base model fresh, deliberately, for
-clean measurement — the wrong pattern for a responsive service, which would
-want one warm base model with LoRA adapters applied/discarded per call
-instead. Not refactoring for this now — new code (this phase's loop-closing
-work) is being shaped with these constraints in mind so the eventual wrapper
-is thin, not a redesign.
+- *Close the loop.* Candidate generation is still entirely manual (every
+  candidate so far has been hand-typed for testing). The pieces above need
+  to compose into an actual cycle: propose candidates → cheap-score →
+  deep-score → `rank_candidates` → `study_topic` on the winner →
+  re-deep-score to check whether it's nearing its mastery limit → archive or
+  continue. The **RESEARCH trigger** (the thing that actually runs this
+  cycle, named after the `LISTENING`/`RESEARCH` state-machine split below)
+  has real open design questions, not yet resolved: whether pipeline
+  capacity is enforced at the candidate tier or the active tier, whether a
+  new `PipelineStatus.SHELVED` value is needed so a displaced-but-still-good
+  item is demoted rather than deleted, what the trigger's "what to
+  research" and "intended duration" parameters actually mean, and how a
+  breadth-then-depth selection policy (explore every `newbie` topic before
+  favoring `curiosity_score`) decides "breadth achieved" and whether
+  newbie-phase selection should be resonance-weighted or strict rotation.
+- *Build the MCP server surface.* `curiosity_tools/mcp_server.py` (new,
+  see Repo layout and "Running the MCP server" below) — a real, running MCP
+  server exposing the current primitives (`add_candidate_topic`,
+  `run_deep_scoring`, `rank_active_topics`, `study_topic`, plus
+  `list_topics`/`get_topic` for introspection) as MCP tools. Deliberately
+  does *not* yet expose a `research_trigger` tool — that's the RESEARCH
+  trigger design work above, still unresolved, and inventing its policy
+  just to fill out the MCP surface would mean building it twice. Exposing
+  the primitives now means `piper_assistant`'s client side and state
+  machine can be built and tested against a real server today, without
+  blocking on that design landing first; a `research_trigger` (or
+  `select_next_topic`) tool gets added to this same server once it does.
+
+**Then — `piper_assistant` becomes the MCP client.** `piper_assistant`
+(Jetson) adds an MCP client and a supervisory state machine (`LISTENING` vs.
+`RESEARCH` mode) that calls the server above during idle time. This is
+`piper_assistant`'s own repo and its own branch — not a new repo — since
+it's extending Piper's existing supervisory loop, not replacing it; see
+`obsidian/Journals/2026-09-19.md` for that decision. Two real architectural
+differences from how this repo ran before the MCP server existed, identified
+before starting rather than discovered partway through, and both already
+reflected in `mcp_server.py`: (1) the existing `curiosity_tools` functions
+take a live model/tokenizer/embedder as parameters — a library shape, not a
+service shape; `mcp_server.py` is the thin wrapper that owns the model
+internally and exposes tools taking only plain, JSON-serializable data.
+(2) Every deep-scoring/study trial still reloads the base model fresh,
+deliberately, for clean measurement — the wrong pattern for a responsive
+service in general, but `mcp_server.py` only keeps warm the one thing that
+actually benefits from it (the cheap, single-forward-pass model+tokenizer+
+embedder used for candidate baseline readings); deep-scoring and study calls
+still reload fresh internally, unchanged, exactly as documented in those
+modules. Not refactoring that part for now — a shared, persistent adapter
+across calls is future work, tracked as its own open question (see "Real
+study" above).
 
 **Later — shrink the structural-leakage confound.** Phase 0's quaddle leak
 (~26% of warbles' improvement showed up on the unrelated control) is real
@@ -158,9 +190,14 @@ disconnected facts.
 - Autonomous candidate generation — every candidate has been human-proposed
   so far; an autonomous "notice something worth being curious about"
   mechanism is unbuilt and unscoped.
-- Full `piper_assistant`/MCP integration before the loop above is closed —
-  there needs to be a coherent, self-running cycle worth exposing as a
-  service before building the service around it.
+- A `research_trigger` MCP tool (or any other orchestration policy exposed
+  over MCP) before the RESEARCH trigger's design questions above are
+  resolved — the primitives are exposed now so `piper_assistant`'s client
+  side isn't blocked, but inventing the selection policy just to fill out
+  the surface would mean building it twice.
+- Any actual code changes in `piper_assistant` itself — that's tracked in
+  that repo, on its own branch, once this repo's MCP server surface is
+  stable enough to build a client against.
 - Real study sessions persisting into a shared, evolving model — every LoRA
   adapter is currently disposable by design; resolving this is a
   prerequisite for genuine cross-session mastery accumulation, not solved
@@ -191,6 +228,7 @@ src/curious_george/
     deep_scoring.py              expensive transferability check + top-N prune/promote pass
     curiosity_score.py           combines mastery + resonance + transferability into one ranking
     study.py                     a real, committed LoRA study session (not a disposable trial)
+    mcp_server.py                MCP server wrapper - the service-shape boundary for piper_assistant
   validation_tools/           proved the mechanism works - not needed once trusted
     fictional_entities.py / .json  warbles/quaddles - Phase 0's fabricated ground truth
     curiosity_topics.py / .json    known/moderate/noise - Phase 1's sibling-pair topic bank
@@ -235,3 +273,30 @@ pip install -r requirements.txt
 pytest -m "not slow"   # fast: memory store, content/schema, loss math, embeddings, orchestration
 pytest -m slow         # slow: real LoRA fine-tuning and deep-scoring runs against Qwen2.5-0.5B
 ```
+
+## Running the MCP server
+
+```bash
+pip install -r requirements.txt -r requirements-mcp.txt
+python -m curious_george.curiosity_tools.mcp_server
+```
+
+Serves over stdio, so it's meant to be launched by an MCP client (an
+`mcp.json`-style config in `piper_assistant`, or `mcp dev` for manual
+poking) rather than run standalone. Loads one base model + tokenizer +
+embedder at startup and keeps them warm for the process lifetime — expect a
+several-second startup delay before it's ready to accept tool calls, same
+as loading the model in a notebook cell. Configuration is via the same
+environment-variable convention `CURIOUS_GEORGE_MEMORY_DIR` already uses:
+
+- `CURIOUS_GEORGE_MODEL` — base model for cheap readings, deep-scoring, and
+  study (default `Qwen/Qwen2.5-0.5B-Instruct`)
+- `CURIOUS_GEORGE_DEVICE` — `cpu` or `cuda` (default `cpu`)
+- `CURIOUS_GEORGE_MEMORY_DIR` — where the store persists (default
+  `data/memory/`; point this at the same location every restart, or the
+  server starts with an empty store)
+
+Tools exposed: `list_topics`, `get_topic`, `add_candidate_topic`,
+`run_deep_scoring`, `rank_active_topics`, `study_topic` — the current
+primitives, unchanged in behavior from calling them directly in Python.
+No `research_trigger` tool yet; see the roadmap above for why.

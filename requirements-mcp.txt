@@ -1,0 +1,9 @@
+# Only needed to run curiosity_tools/mcp_server.py - the notebook and the
+# rest of the test suite don't touch this, so it's kept out of
+# requirements.txt rather than making every Colab session install it.
+#
+# Pinned to >=2.0.0 deliberately: mcp 2.x renamed FastMCP to MCPServer
+# (mcp.server.mcpserver.MCPServer) with a different import path and some
+# API changes - mcp_server.py targets that current shape, not the v1
+# FastMCP examples most existing docs still show.
+mcp>=2.0.0
